@@ -4,6 +4,7 @@ import ProfileCard from './ProfileCard.vue';
 import MoreActionsMenu from '@/components/shared/MoreActionsMenu.vue';
 import PanelHeader from '@/components/shared/PanelHeader.vue';
 import PanelPagination from '@/components/shared/PanelPagination.vue';
+import EmptyState from '@/components/ui/EmptyState.vue';
 
 const props = defineProps({
   profiles: Array,
@@ -15,7 +16,7 @@ const props = defineProps({
   totalPages: Number,
 });
 
-const emit = defineEmits(['add', 'edit', 'delete', 'deleteAll', 'toggle', 'copyLink', 'copyClashLink', 'preview', 'reorder', 'changePage', 'viewLogs', 'qrcode']);
+const emit = defineEmits(['add', 'edit', 'delete', 'deleteAll', 'toggle', 'openCopy', 'preview', 'reorder', 'changePage', 'viewLogs', 'qrcode']);
 
 // [FIX] Compute profiles to display: use paginated if available, else all profiles
 const displayProfiles = computed(() => {
@@ -35,8 +36,7 @@ const displayProfiles = computed(() => {
 const handleEdit = (profileId) => emit('edit', profileId);
 const handleDelete = (profileId) => emit('delete', profileId);
 const handleToggle = (event) => emit('toggle', event);
-const handleCopyLink = (profileId) => emit('copyLink', profileId);
-const handleCopyClashLink = (profileId) => emit('copyClashLink', profileId);
+const handleOpenCopy = (profileId) => emit('openCopy', profileId);
 const handlePreview = (profileId) => emit('preview', profileId);
 const handleAdd = () => emit('add');
 const handleChangePage = (page) => emit('changePage', page);
@@ -67,7 +67,7 @@ const handleMoveDown = (index) => {
           <button @click="handleAdd" class="text-sm font-medium px-4 py-2 misub-radius-lg bg-primary-600 hover:bg-primary-700 text-white transition-colors shadow-sm shadow-primary-500/20 shrink-0">新增</button>
           <MoreActionsMenu :teleport-to-body="true" menu-width-class="w-36">
             <template #menu="{ close }">
-              <button @click="handleDeleteAll(); close()" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10">清空</button>
+              <button @click="handleDeleteAll(); close()" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-500/10">清空</button>
             </template>
           </MoreActionsMenu>
         </template>
@@ -94,8 +94,7 @@ const handleMoveDown = (index) => {
             @move-up="handleMoveUp(index)"
             @move-down="handleMoveDown(index)"
             @view-logs="emit('viewLogs', profile.id)"
-            @copy-link="handleCopyLink(profile.id)"
-            @copy-clash-link="handleCopyClashLink(profile.id)"
+            @open-copy="handleOpenCopy(profile.id)"
           />
         </div>
       </div>
@@ -106,10 +105,13 @@ const handleMoveDown = (index) => {
         @change-page="handleChangePage"
       />
     </div>
-    <div v-else class="text-center py-12 text-gray-500 border-2 border-dashed border-gray-300 dark:border-gray-700 misub-radius-lg">
-      <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-      <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">没有订阅组</h3>
-      <p class="mt-1 text-sm text-gray-500">创建一个订阅组来组合你的节点吧！</p>
+    <div v-else class="py-4 border-2 border-dashed border-gray-300 dark:border-gray-700 misub-radius-lg">
+      <EmptyState 
+        title="没有订阅组" 
+        description="创建一个订阅组来组合你的节点吧！" 
+        icon="folder" 
+        :total-count="0" 
+      />
     </div>
   </div>
 </template>
